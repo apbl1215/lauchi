@@ -15,8 +15,13 @@
     "supabase:migrate": "supabase migration up"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-toast": "^1.2.14",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.53.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "csv-parse": "^6.1.0",
     "exceljs": "^4.4.0",
