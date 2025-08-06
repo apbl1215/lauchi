@@ -479,3 +479,70 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   }
 }
+
+// ============================================
+// ADD THIS TO YOUR lib/utils.ts FILE
+// Content analysis function
+// ============================================
+
+// Content analysis utilities
+export function analyzeContent(text: string) {
+  const wordCount = countWords(text)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0)
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0)
+  
+  // Calculate reading time (average 200 words per minute)
+  const readingTimeMinutes = Math.ceil(wordCount / 200)
+  
+  // Estimate complexity based on sentence length and vocabulary
+  const avgWordsPerSentence = wordCount / sentences.length
+  const longWords = text.split(/\s+/).filter(word => word.length > 7).length
+  const complexityRatio = longWords / wordCount
+  
+  let complexity: 'Low' | 'Medium' | 'High' = 'Low'
+  if (avgWordsPerSentence > 20 || complexityRatio > 0.3) {
+    complexity = 'High'
+  } else if (avgWordsPerSentence > 15 || complexityRatio > 0.2) {
+    complexity = 'Medium'
+  }
+  
+  // Extract potential topics (simple keyword extraction)
+  const words = text.toLowerCase().match(/\b\w{4,}\b/g) || []
+  const wordFreq: Record<string, number> = {}
+  
+  words.forEach(word => {
+    if (!isCommonWord(word)) {
+      wordFreq[word] = (wordFreq[word] || 0) + 1
+    }
+  })
+  
+  const topics = Object.entries(wordFreq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([word]) => word)
+  
+  return {
+    wordCount,
+    sentenceCount: sentences.length,
+    paragraphCount: paragraphs.length,
+    readingTimeMinutes,
+    complexity,
+    avgWordsPerSentence: Math.round(avgWordsPerSentence),
+    topics,
+    estimatedFlashcards: Math.min(Math.ceil(wordCount / 100), 50),
+    estimatedQuizQuestions: Math.min(Math.ceil(wordCount / 200), 25)
+  }
+}
+
+// Helper function to identify common words
+function isCommonWord(word: string): boolean {
+  const commonWords = [
+    'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+    'from', 'up', 'about', 'into', 'over', 'after', 'this', 'that', 'these', 'those',
+    'they', 'them', 'their', 'there', 'then', 'than', 'when', 'where', 'why', 'how',
+    'what', 'which', 'who', 'will', 'would', 'could', 'should', 'have', 'has', 'had',
+    'been', 'being', 'very', 'more', 'most', 'much', 'many', 'some', 'any', 'all'
+  ]
+  
+  return commonWords.includes(word.toLowerCase())
+}
